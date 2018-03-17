@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>ファン獲得♥スクールアイドル大作戦　スコアシート</title>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    html {
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        font-size: 28pt;
+        text-align: center;
+    }
+    div.score {
+        margin: 0;
+        padding: 5px 0;
+        width: 100vw;
+        height: 20vh;
+        text-align: center;
+    }
+    div.score h3 {
+        margin: 0;
+        height: 50px;
+        font-size: 25pt;
+    }
+    div.score div {
+        height: calc(100% - 50px);
+        font-size: 20pt;
+    }
+    div.score span {
+        display: inline-block;
+        width: 3em;
+    }
+    div.score button {
+        height :100%;
+        width: 70px;
+        font-size: 20pt;
+    }
+    .passion {
+        background-color: #ffa3a3;
+    }
+    .vocal {
+        background-color: #a3a3ff;
+    }
+    .appeal {
+        background-color: #999999;
+    }
+    .fan {
+        background-color: #ffffa3;
+    }
+</style>
+</head>
+<body>
+    <div>
+        <h1>ファン獲得 ♥ スコア</h1>
+    </div>
+    <counter></counter>
+
+    <script type="riot/tag">
+        <counter>
+            <div each="{ state.score }" class="score { id }">
+                <h3>{ name }</h3>
+                <div>
+                    <button onclick="{ minus }">－</button>
+                    <span>{ point }</span>
+                    <button onclick="{ plus }">＋</button>
+                </div>
+            </div>
+
+            var store = this.riotx.get();
+            this.state = store.getter("state");
+            store.change('changed', (state, store) => {
+                this.state = state;
+                this.update();
+            });
+
+            this.minus = (e) => {
+                store.action("add", {
+                    id: e.item.id,
+                    point: -1
+                });
+            };
+            this.plus = (e) => {
+                store.action("add", {
+                    id: e.item.id,
+                    point: 1
+                });
+            };
+
+        </counter>
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/riot@3.9/riot+compiler.min.js"></script>
+    <script src="https://unpkg.com/riotx/dist/riotx.min.js"></script>
+    <script>
+        const store = new riotx.Store({
+            state: {
+                score: [
+                    {
+                        id: "passion",
+                        name: "パッション",
+                        point: 0
+                    },
+                    {
+                        id: "vocal",
+                        name: "ボーカル",
+                        point: 0
+                    },
+                    {
+                        id: "appeal",
+                        name: "アピール",
+                        point: 0
+                    },
+                    {
+                        id: "fan",
+                        name: "ファン",
+                        point: 0
+                    }
+                ]
+            },
+            getters: {
+                state: (context) => {
+                    return context.state;
+                }
+            },
+            mutations: {
+                add: (context, arg) => {
+                    var itm = context.state.score.find((x) => {
+                        return x.id == arg.id;
+                    });
+                    if (itm != null) {
+                        itm.point += arg.point;
+                    }
+                    return ['changed'];
+                }
+            },
+            actions: {
+                add: (context, arg) => {
+                    return Promise
+                    .resolve()
+                    .then(() => {
+                        context.commit("add", arg);
+                    });
+                }
+            }
+        });
+        
+        riotx.add(store);
+        riot.mount('*')
+    </script>
+</body>
+</html>
